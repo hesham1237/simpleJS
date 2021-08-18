@@ -1,0 +1,60 @@
+version: "3.7"
+
+services:
+  web:
+    image: dockerfile2
+    container_name: front-end 
+    build:
+      context: ./frontend
+    ports:
+      - 80:3000
+    environment:
+      - API_URL=http://api:3001/data
+    networks:
+      - network_public
+    depends_on:
+      - api
+    links:
+      - "db:database"
+
+  api:
+    container_name: back-end
+    build:
+      context: ./backend
+    environment:
+      - CONNECTION_STRING=postgresql://postgres:admin@db:5432/CODINGDOJO-SQL
+    networks:
+      - database-network
+      - network_public
+    depends_on:
+      - db
+
+  db:
+    image: postgres:11.2-alpine
+    container_name: database
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=CODINGDOJO-SQL
+    volumes:
+      - volume-sql-config:/var/lib/docker/volumes/volume-sql-config/_data
+      - volume-sql:/var/lib/docker/volumes/volume-sql
+      - ./sql_scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - database-network
+
+volumes:
+  volume-sql-config:
+  volume-sql:
+
+networks:
+  database-network:
+    name: database-network 
+    driver: bridge
+
+  network_public:
+    name:  network_public  
+    driver: bridge
+
