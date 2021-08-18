@@ -26,7 +26,7 @@ jobs:
 
       
       - name: Run a one-line script
-        run: echo Check Check 1.. 2.. Noice ! ;)
+        run: echo Check Check 1.. 2.. Noice 
 
       
       - name: Set up Docker Buildx
